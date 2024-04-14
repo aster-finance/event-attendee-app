@@ -16,7 +16,7 @@ export default function EventCard({
           <p className="text-subtext">{formatDate(event.start_at)}</p>
           <h2 className="text-xl font-medium">{event.name}</h2>
           <p className="text-subtext">
-            {event.geo_address_info ? event.geo_address_info["city"] ?? "" : ""}
+            {event.geo_address_info ? "city" ?? "" : ""}
           </p>
         </div>
         <div className="w-3/12">

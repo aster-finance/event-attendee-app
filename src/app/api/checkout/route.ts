@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { env } from "~/env";
+import { fetchSubscriptionData } from "~/supabase";
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
@@ -25,6 +26,12 @@ export async function POST(req: Request, res: Response) {
   } else {
     customerId = hasCustomerId.data[0].id;
   }
+
+  const [subscription] = await fetchSubscriptionData(lumaId);
+  if (subscription && subscription.status === "active") {
+    //already subscribed
+    return Response.redirect(env.APP_BASE_URL + "/" + lumaId);
+  }
  
   // Create Checkout Sessions from body params.
   const session = await stripe.checkout.sessions.create({
@@ -36,8 +43,8 @@ export async function POST(req: Request, res: Response) {
       },
     ],
     mode: "subscription",
-    success_url: `http://localhost:3000/${lumaId}?customerId=${customerId}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: "http://localhost:3000",
+    success_url: `${env.APP_BASE_URL}/${lumaId}?customerId=${customerId}&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: env.APP_BASE_URL,
   });
 
   return Response.redirect(session.url ?? "");
