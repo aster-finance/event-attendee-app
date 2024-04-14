@@ -20,7 +20,7 @@ export function ExportButton(props: { eventName: string; attendees: User[] }) {
       const row = [
         attendee.name,
         attendee.linkedin_handle ?? "",
-        attendee.twitter_handle ?? ""
+        attendee.twitter_handle ?? "",
       ];
       csvRows.push(row.join(","));
     });
@@ -49,10 +49,7 @@ export function ExportButton(props: { eventName: string; attendees: User[] }) {
   }
 
   return (
-    <button
-      className="btn btn-neutral btn-sm bg-text"
-      onClick={exportTableAsCSV}
-    >
+    <button className="btn btn-neutral bg-text" onClick={exportTableAsCSV}>
       Export as CSV
       {loading && <span className="loading loading-sm ml-2"></span>}
       {checkMark && <span>&#10003;</span>}

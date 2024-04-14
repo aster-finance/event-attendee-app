@@ -1,6 +1,5 @@
 import Stripe from "stripe";
 import { env } from "~/env";
-import { fetchSubscriptionData, insertSubscriptionData } from "~/supabase";
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
@@ -11,30 +10,34 @@ export async function POST(req: Request, res: Response) {
   if (!lumaId || typeof lumaId != "string")
     throw new Error("lumaId is required");
 
-  const [subscription] = await fetchSubscriptionData(lumaId);
-  if (subscription?.external_customer_id) return Response.json({});
+  let customerId = "";
 
-  // Create Checkout Sessions from body params.
-  const customer = await stripe.customers.create({
-    metadata: { lumaId: lumaId },
+  const hasCustomerId = await stripe.customers.search({
+    query: `metadata[lumaId]:${lumaId}`,
+    limit: 1,
   });
 
-  await insertSubscriptionData(lumaId, customer.id);
-
+  if (!hasCustomerId.data || !hasCustomerId.data[0]){
+    const customer = await stripe.customers.create({
+      metadata: { lumaId: lumaId },
+    });
+    customerId = customer.id;
+  } else {
+    customerId = hasCustomerId.data[0].id;
+  }
+ 
   // Create Checkout Sessions from body params.
   const session = await stripe.checkout.sessions.create({
-    customer: customer.id,
+    customer: customerId,
     line_items: [
       {
-        // Provide the exact Price ID (for example, pr_1234) of
-        // the product you want to sell
         price: "price_1P4xzxIzfeJM2nkEjFqf5v2r",
         quantity: 1,
       },
     ],
     mode: "subscription",
-    success_url: `http://localhost:3002/return?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: "http://localhost:3002/cancel",
+    success_url: `http://localhost:3000/${lumaId}?customerId=${customerId}&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: "http://localhost:3000",
   });
 
   return Response.redirect(session.url ?? "");

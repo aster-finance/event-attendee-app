@@ -1,7 +1,7 @@
 "use client";
 
-import { AuroraBackground } from "./ArouraBackground";
 import { motion } from "framer-motion";
+import { AuroraBackground } from "./ArouraBackground";
 
 export default function HomePage() {
   return (
@@ -19,16 +19,14 @@ export default function HomePage() {
         <div className="flex min-h-screen justify-center">
           <div className="flex max-w-5xl items-center justify-center gap-12">
             <div className="flex w-full flex-col gap-6">
-              <h1 className="text-6xl font-bold text-text">Luma Saver</h1>
+              <h1 className="text-6xl font-bold text-text">Who was at</h1>
               <h2 className="text-2xl font-medium text-text">
-                See everyone who you attended events withm faster than ever
+                See everyone you've ever attended events with
               </h2>
-              <button className="btn btn-neutral">
-                Download our Chrome Extension
-              </button>
+              <a className="btn btn-neutral">Download the Chrome Extension</a>
             </div>
-            <div className="roundend-2xl h-1/2 w-full bg-purple-100">
-              <p>Image here</p>
+            <div className="h-1/2 w-full rounded-2xl ">
+              <img src="/logo.png" className="h-full w-full object-cover" />
             </div>
           </div>
         </div>

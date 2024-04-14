@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { fetchConsentedAttendeesForUser, fetchEventById } from "~/supabase";
+import { defaultAvatar, formatDate } from "~/utils";
 import { ExportButton } from "./ExportButton";
 import { linkedinLogo, twitterLogo } from "./logos";
-import { fetchConsentedAttendeesForUser, fetchEventById } from "~/supabase";
-import { formatDate } from "~/utils";
 
 export default async function EventPage({
   params,
@@ -31,20 +31,29 @@ export default async function EventPage({
               <p className="text-subtext hover:font-medium">&lsaquo; Back</p>
             </Link>
           )}
-          {event?.cover_url && (
+          <div className="flex aspect-square w-full items-center self-center overflow-clip rounded-xl bg-gray-200 max-sm:w-3/5">
             <img
-              src={event.cover_url}
-              className="aspect-square w-full self-center rounded-xl max-sm:w-3/5"
+              src={event.cover_url ?? defaultAvatar}
+              className="h-full w-full object-cover"
             />
-          )}
+          </div>
+          <div className="flex gap-2 text-lg text-subtext max-sm:self-center">
+            <p>{attendees.length} Attendees</p>
+            <p>&bull;</p>
+            <p>
+              {attendees.filter((a) => !!a.linkedin_handle).length} Linkedins
+            </p>
+          </div>
+          <ExportButton eventName={event.name ?? ""} attendees={attendees} />
         </div>
         <div className="flex w-full flex-col gap-4">
-          <div className="flex w-full items-end justify-between">
-            <div className="flex flex-col gap-4">
-              <h1 className="text-3xl font-bold">{event.name}</h1>
-              <p className="text-lg text-subtext">{formatDate(event.start_at)}</p>
+          <div className="flex w-full flex-col gap-4">
+            <h1 className="text-3xl font-bold">{event.name}</h1>
+            <div className="flex gap-2 text-xl text-subtext max-sm:self-center">
+              <h2>{formatDate(event.start_at)}</h2>
+              {event.geo_address_info["city"] && <h2>&bull;</h2>}
+              <h2>{event.geo_address_info["city"]}</h2>
             </div>
-            <ExportButton eventName={event.name ?? event.start_at ?? ""} attendees={attendees}/>
           </div>
           <div className="overflow-auto rounded-xl border border-text border-opacity-[.16]">
             <table className="table table-zebra">
@@ -62,12 +71,7 @@ export default async function EventPage({
                     <td>
                       <div className="avatar">
                         <div className="w-12 rounded-xl">
-                          <img
-                            src={
-                              attendee.avatar_url ??
-                              "https://cdn.lu.ma/avatars-default/avatar_21.png"
-                            }
-                          />
+                          <img src={attendee.avatar_url ?? defaultAvatar} />
                         </div>
                       </div>
                     </td>
