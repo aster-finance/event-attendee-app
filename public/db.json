@@ -1,0 +1,108 @@
+{
+"attendees": [
+    {
+        "name": "John Doe",
+        "linkedin": "https://www.linkedin.com/in/johndoe",
+        "twitter": "https://twitter.com/johndoe",
+        "lumaId": "usr_1"
+    },
+    {
+        "name": "Jane Smith",
+        "linkedin": "https://www.linkedin.com/in/janesmith",
+        "twitter": "https://twitter.com/janesmith",
+        "lumaId": "usr_2"
+    },
+    {
+        "name": "Alex Johnson",
+        "linkedin": "https://www.linkedin.com/in/alexjohnson",
+        "twitter": "https://twitter.com/alexjohnson",
+        "lumaId": "usr_3"
+    },
+    {
+        "name": "Sarah Williams",
+        "linkedin": "https://www.linkedin.com/in/sarahwilliams",
+        "twitter": "https://twitter.com/sarahwilliams",
+        "lumaId": "usr_4"
+    }
+],
+  "events": [
+    {
+      "name": "Event 1",
+      "date": "2020-01-01",
+      "location": "San Francisco",
+      "eventId": "evt_1",
+      "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=1,quality=75,width=300,height=300/event-covers/1b/ad06fc45-24ce-4a15-837d-547cd08ae2c0",
+      "color": "#0D3849"
+    },
+    {
+      "name": "Event 2",
+      "date": "2020-02-02",
+      "location": "New York",
+      "eventId": "evt_2",
+      "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=1,quality=75,width=300,height=300/event-covers/1b/ad06fc45-24ce-4a15-837d-547cd08ae2c0",
+      "color": "#0D3329"
+    },
+    {
+      "name": "Event 3",
+      "date": "2020-03-03",
+      "location": "Los Angeles",
+      "eventId": "evt_3",
+      "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=1,quality=75,width=300,height=300/event-covers/1b/ad06fc45-24ce-4a15-837d-547cd08ae2c0",
+      "color": "#233849"
+    }
+  ],
+  "event_attendees": [
+    {
+      "lumaId": "usr_1",
+      "eventId": "evt_1"
+    },
+    {
+      "lumaId": "usr_2",
+      "eventId": "evt_1"
+    },
+    {
+      "lumaId": "usr_3",
+      "eventId": "evt_1"
+    },
+    {
+      "lumaId": "usr_4",
+      "eventId": "evt_1"
+    },
+    {
+      "lumaId": "usr_1",
+      "eventId": "evt_2"
+    },
+    {
+      "lumaId": "usr_2",
+      "eventId": "evt_2"
+    },
+    {
+      "lumaId": "usr_4",
+      "eventId": "evt_2"
+    },
+    {
+      "lumaId": "usr_2",
+      "eventId": "evt_3"
+    },
+    {
+      "lumaId": "usr_3",
+      "eventId": "evt_3"
+    },
+    {
+      "lumaId": "usr_4",
+      "eventId": "evt_3"
+    }
+  ],
+  "scrapes": [
+    {
+      "lumaId": "usr_1",
+      "eventId": "evt_1"
+    },
+    { "lumaId": "usr_2", "eventId": "evt_1" },
+    { "lumaId": "usr_3", "eventId": "evt_1" },
+    { "lumaId": "usr_1", "eventId": "evt_2" },
+    { "lumaId": "usr_2", "eventId": "evt_2" },
+    { "lumaId": "usr_2", "eventId": "evt_3" },
+    { "lumaId": "usr_3", "eventId": "evt_3" }
+  ]
+}

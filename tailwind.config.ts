@@ -16,5 +16,11 @@ export default {
       },
     },
   },
+  purge: {
+    content: ["./src/**/*.tsx"],
+    options: {
+      safelist: [{pattern: /bg-./}, "bg-[#0D3849]"],
+    }
+  },
   plugins: [require("daisyui")]
 } satisfies Config;

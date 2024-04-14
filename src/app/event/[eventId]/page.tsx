@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Attendee, Event, EventAttendee } from "~/types";
 import { ExportButton } from "./ExportButton";
 import { linkedinLogo, twitterLogo } from "./logos";
 
@@ -66,76 +68,103 @@ const superAttendees = [
 
 const user = "hdusukehuireh";
 
-export default function EventPage() {
+export default async function EventPage({
+  params,
+  searchParams,
+}: {
+  params: { eventId: string };
+  searchParams: { lumaId: string };
+}) {
+  const db = await fetch("http:localhost:3000/db.json");
+  const data = await db.json();
+  const allEvents = data.events as Event[];
+  const thisEvent = allEvents.find((event) => event.eventId === params.eventId);
+
+  if (!thisEvent) {
+    //TODO: Handle event not found
+    redirect("/404");
+  }
+
+  const eventAttendees = data.event_attendees as EventAttendee[];
+  const thisEventAttendeesIds = eventAttendees
+    .filter((eventAttendee) => eventAttendee.eventId === thisEvent.eventId)
+    .map((eventAttendee) => eventAttendee.lumaId);
+
+  const allAttendees = data.attendees as Attendee[];
+
+  const thisEventAttendees = allAttendees.filter((attendee) =>
+    thisEventAttendeesIds.includes(attendee.lumaId),
+  );
+
+  const backgroundColor = `bg-[${thisEvent.color}]`;
+
   return (
-    <main className="flex min-h-screen justify-center bg-background p-4 sm:p-12">
-      <div className="container flex flex-col gap-12">
-        {user && (
-          <Link href={`/${user}`}>
-            <p className="text-subtext hover:font-medium">&lsaquo; Back</p>
-          </Link>
-        )}
-        <div className="max-xs:flex-col flex w-full items-end justify-between ">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <h1 className="text-text text-3xl font-semibold">
-                {eventInfo.name}
-              </h1>
-              <a
-                href={eventInfo.url}
-                target="_blank"
-                className="text-text text-xl"
-              >
-                &#x1F310;
-              </a>
+    <main className={`flex min-h-screen justify-center px-3 py-3 sm:py-6`}>
+      <div className="flex w-full max-w-5xl gap-8 max-sm:flex-col">
+        <div className="flex w-[45%] flex-col gap-4 max-sm:w-full">
+          {searchParams.lumaId && (
+            <Link href={`/${searchParams.lumaId}`}>
+              <p className="text-subtext hover:font-medium">&lsaquo; Back</p>
+            </Link>
+          )}
+          <img
+            src={thisEvent.image}
+            className="aspect-square w-full self-center rounded-xl max-sm:w-3/5"
+          />
+        </div>
+        <div className="flex w-full flex-col gap-4">
+          <div className="flex w-full items-end justify-between">
+            <div className="flex flex-col gap-4">
+              <h1 className="text-3xl font-bold">{thisEvent.name}</h1>
+              <p>{thisEvent.date}</p>
             </div>
-            <p className="text-subtext">{eventInfo.date}</p>
-            <div className="flex gap-1">
-              <p className="badge badge-outline text-text">92</p>
-              <p className="badge badge-outline text-text">70</p>
-              <p className="badge badge-outline text-text">23</p>
-            </div>
+            <ExportButton
+              eventName={eventInfo.name}
+              attendees={thisEventAttendees}
+            />
           </div>
-          <ExportButton eventName={eventInfo.name} attendees={superAttendees} />
-        </div>
-        <div className="border-text overflow-auto rounded-xl border border-opacity-[.16]">
-          <table className="table-zebra table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Name</th>
-                <th>LinkedIn</th>
-                <th>Twitter</th>
-              </tr>
-            </thead>
-            <tbody>
-              {superAttendees.map((attendee, index) => (
-                <tr key={index}>
-                  <td>
-                    <div className="avatar">
-                      <div className="w-12 rounded-xl">
-                        <img src="https://cdn.lu.ma/avatars-default/avatar_21.png" />
-                      </div>
-                    </div>
-                  </td>
-                  <td>{attendee.name}</td>
-                  <td>
-                    <a href={attendee.linkedin} target="_blank">
-                      {attendee.linkedin ? linkedinLogo : ""}
-                    </a>
-                  </td>
-                  <td>
-                    <a href={attendee.twitter} target="_blank">
-                      {attendee.twitter ? twitterLogo : ""}
-                    </a>
-                  </td>
+          <div className="overflow-auto rounded-xl border border-text border-opacity-[.16]">
+            <table className="table table-zebra">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Name</th>
+                  <th>LinkedIn</th>
+                  <th>Twitter</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="text-text flex w-full items-center">
-          <p>Create an account to save</p>
+              </thead>
+              <tbody>
+                {thisEventAttendees.map((attendee, index) => (
+                  <tr key={index}>
+                    <td>
+                      <div className="avatar">
+                        <div className="w-12 rounded-xl">
+                          <img src="https://cdn.lu.ma/avatars-default/avatar_21.png" />
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <a
+                        href={`http://localhost:3000/user/${attendee.lumaId}?lumaId=${searchParams.lumaId}`}
+                      >
+                        {attendee.name}
+                      </a>
+                    </td>
+                    <td>
+                      <a href={attendee.linkedin} target="_blank">
+                        {attendee.linkedin ? linkedinLogo : ""}
+                      </a>
+                    </td>
+                    <td>
+                      <a href={attendee.twitter} target="_blank">
+                        {attendee.twitter ? twitterLogo : ""}
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </main>
