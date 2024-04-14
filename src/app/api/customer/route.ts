@@ -1,21 +1,7 @@
 import Stripe from "stripe";
 import { env } from "~/env";
 
-const stripe = new Stripe(
-  env.STRIPE_SECRET_KEY
-);
-
-export async function POST(req: Request, res: Response) {
-  const body = await req.json();
-  const { lumaId, email } = body;
-  // Create Checkout Sessions from body params.
-  const customer = await stripe.customers.create({
-    email: email,
-    metadata: { lumaId: lumaId },
-  });
-
-  return Response.json({ stripeId: customer.id });
-}
+const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
 export async function GET(req: Request, res: Response) {
   try {
@@ -34,10 +20,10 @@ export async function GET(req: Request, res: Response) {
     return Response.json({
       email: customer.email,
       lumaId: customer.metadata.lumaId,
-      isSubscribed: isSubscribed
+      isSubscribed: isSubscribed,
     });
   } catch (err) {
     console.log("err", err);
-    return Response.json({ error: "Error" + err});
+    return Response.json({ error: "Error" + err });
   }
 }
