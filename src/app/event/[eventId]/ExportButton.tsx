@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User } from "~/types";
+import type { User } from "~/types";
 
 export function ExportButton(props: { eventName: string; attendees: User[] }) {
   const [loading, setLoading] = useState(false);

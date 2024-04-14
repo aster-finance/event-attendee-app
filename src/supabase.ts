@@ -1,7 +1,7 @@
 // background.js
 import { createClient } from "@supabase/supabase-js";
-import { Database } from "types/supabase";
-import { Event, User } from "./types";
+import type { Database } from "types/supabase";
+import type { Event, User } from "./types";
 const supabaseUrl = "https://frblrutuutuvhkilgsjb.supabase.co/";
 const supabaseAnonKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyYmxydXR1dXR1dmhraWxnc2piIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMwMTE5MjcsImV4cCI6MjAyODU4NzkyN30.KHRrmd7ZDtN3JElfMLSVe3hUS0ltel15OvDyHRSq13E";
@@ -12,9 +12,13 @@ export const fetchRemainingScrapes = async (userId: string) => {
     .from("subscription")
     .select("*")
     .eq("user_id", userId);
-  if (subscriptionError || !subscriptionData) {
+  
+  if (subscriptionError) {
     throw new Error(subscriptionError.message);
+  } else if (!subscriptionData) {
+    throw new Error("Missing subscription data");
   }
+
   const [subscription] = subscriptionData ?? [];
 
   // unlimited for paying customers
@@ -121,13 +125,15 @@ export const fetchSubscriptionData = async (userId: string) => {
 export const insertSubscriptionData = async (
   userId: string,
   customerId: string,
+  active: boolean
 ) => {
   const { data, error } = await supabase
     .from("subscription")
-    .insert([
+    .upsert([
       {
         user_id: userId,
         external_customer_id: customerId,
+        status: active ? "active" : "init",
       },
     ])
     .select("*");

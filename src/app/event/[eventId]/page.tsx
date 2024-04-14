@@ -20,7 +20,8 @@ export default async function EventPage({
 
   if (!event) return redirect("/404");
 
-  const backgroundColor = `bg-[${event.tint_color}]`;
+  const city =
+    event.geo_address_info !== null ? event.geo_address_info.city : "";
 
   return (
     <main className={`flex min-h-screen justify-center px-3 py-3 sm:py-6`}>
@@ -51,8 +52,8 @@ export default async function EventPage({
             <h1 className="text-3xl font-bold">{event.name}</h1>
             <div className="flex gap-2 text-xl text-subtext max-sm:self-center">
               <h2>{formatDate(event.start_at)}</h2>
-              {event.geo_address_info["city"] && <h2>&bull;</h2>}
-              <h2>{event.geo_address_info["city"]}</h2>
+              {city && <h2>&bull;</h2>}
+              <h2>{city}</h2>
             </div>
           </div>
           <div className="overflow-auto rounded-xl border border-text border-opacity-[.16]">

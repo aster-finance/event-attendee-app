@@ -9,7 +9,7 @@ const inter = Inter({
 
 export const metadata = {
   title: "Who Was At",
-  description: "See everyone you've ever attended Luma events with",
+  description: "See everyone you've ever attended events with",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

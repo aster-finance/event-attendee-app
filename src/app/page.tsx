@@ -21,12 +21,16 @@ export default function HomePage() {
             <div className="flex w-full flex-col gap-6">
               <h1 className="text-6xl font-bold text-text">Who was at</h1>
               <h2 className="text-2xl font-medium text-text">
-                See everyone you've ever attended events with
+                See everyone you&lsquo;ve ever attended events with
               </h2>
               <a className="btn btn-neutral">Download the Chrome Extension</a>
             </div>
             <div className="h-1/2 w-full rounded-2xl ">
-              <img src="/logo.png" className="h-full w-full object-cover" />
+              <img
+                src="/logo.png"
+                className="h-full w-full object-cover"
+                alt="Who was at logo"
+              />
             </div>
           </div>
         </div>

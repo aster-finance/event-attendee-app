@@ -1,10 +1,10 @@
 import Stripe from "stripe";
 import { env } from "~/env";
-import { fetchSubscriptionData } from "~/supabase";
+import { fetchSubscriptionData, insertSubscriptionData } from "~/supabase";
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   const formData = await req.formData();
   const lumaId = formData.get("lumaId");
 
@@ -17,22 +17,22 @@ export async function POST(req: Request, res: Response) {
     query: `metadata[lumaId]:${lumaId}`,
     limit: 1,
   });
+  
+  if (hasCustomerId.data[0]) {
+    customerId = hasCustomerId.data[0].id;
 
-  if (!hasCustomerId.data || !hasCustomerId.data[0]){
+    const [subscription] = await fetchSubscriptionData(lumaId);
+    if (subscription && subscription.status === "active") {
+      //already subscribed
+      return Response.redirect(env.APP_BASE_URL + "/" + lumaId);
+    }
+  } else {
     const customer = await stripe.customers.create({
       metadata: { lumaId: lumaId },
     });
+    await insertSubscriptionData(lumaId, customer.id, false);
     customerId = customer.id;
-  } else {
-    customerId = hasCustomerId.data[0].id;
   }
-
-  const [subscription] = await fetchSubscriptionData(lumaId);
-  if (subscription && subscription.status === "active") {
-    //already subscribed
-    return Response.redirect(env.APP_BASE_URL + "/" + lumaId);
-  }
- 
   // Create Checkout Sessions from body params.
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
@@ -48,20 +48,4 @@ export async function POST(req: Request, res: Response) {
   });
 
   return Response.redirect(session.url ?? "");
-}
-
-export async function GET(req: Request, res: Response) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const session_id = searchParams.get("session_id");
-    if (!session_id) throw new Error("session_id is required");
-    const session = await stripe.checkout.sessions.retrieve(session_id);
-
-    return Response.json({
-      status: session.status,
-      customer_email: session.customer_details?.email,
-    });
-  } catch (err) {
-    return Response.json({ error: "Error" + err });
-  }
 }

@@ -24,7 +24,11 @@ export default async function UserPage({
     <main className="flex min-h-screen flex-col gap-8 bg-white">
       <div className="flex flex-col items-center justify-center gap-4 bg-[#FEF8FA] p-8">
         <div className="object-clip aspect-square w-32 overflow-clip rounded-xl">
-          <img src={friend.avatar_url ?? defaultAvatar} className="w-full" />
+          <img
+            src={friend.avatar_url ?? defaultAvatar}
+            className="w-full"
+            alt={`${friend.name} avatar`}
+          />
         </div>
         <h1 className="text-3xl font-semibold text-text">{friend.name}</h1>
         <div className="flex gap-2">
