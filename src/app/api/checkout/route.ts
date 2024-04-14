@@ -12,18 +12,25 @@ export async function POST(req: Request, res: Response) {
     throw new Error("lumaId is required");
 
   const [subscription] = await fetchSubscriptionData(lumaId);
-  if (subscription?.external_customer_id) return Response.json({});
+  let customerId;
+  if (subscription && subscription.status === "active") {
+    //already subscribed
+    return Response.json({});
+  } else if (subscription) {
+    customerId = subscription.external_customer_id;
+  } else {
+    // Create Checkout Sessions from body params.
+    const { id } = await stripe.customers.create({
+      metadata: { lumaId: lumaId },
+    });
+    customerId = id;
+  }
 
-  // Create Checkout Sessions from body params.
-  const customer = await stripe.customers.create({
-    metadata: { lumaId: lumaId },
-  });
-
-  await insertSubscriptionData(lumaId, customer.id);
+  // await insertSubscriptionData(lumaId, customer.id);
 
   // Create Checkout Sessions from body params.
   const session = await stripe.checkout.sessions.create({
-    customer: customer.id,
+    customer: customerId,
     line_items: [
       {
         // Provide the exact Price ID (for example, pr_1234) of
@@ -33,8 +40,8 @@ export async function POST(req: Request, res: Response) {
       },
     ],
     mode: "subscription",
-    success_url: `http://localhost:3002/return?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: "http://localhost:3002/cancel",
+    success_url: `${process.env.APP_BASE_URL}/${lumaId}?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.APP_BASE_URL}/cancel`,
   });
 
   return Response.redirect(session.url ?? "");
