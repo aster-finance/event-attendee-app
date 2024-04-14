@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { User } from "~/types";
 
-export function ExportButton(props: { eventName: string; attendees: any[] }) {
+export function ExportButton(props: { eventName: string; attendees: User[] }) {
   const [loading, setLoading] = useState(false);
   const [checkMark, setCheckMark] = useState(false);
 
@@ -18,8 +19,8 @@ export function ExportButton(props: { eventName: string; attendees: any[] }) {
     props.attendees.forEach((attendee) => {
       const row = [
         attendee.name,
-        attendee.linkedin ?? "",
-        attendee.twitter ?? "",
+        attendee.linkedin_handle ?? "",
+        attendee.twitter_handle ?? ""
       ];
       csvRows.push(row.join(","));
     });
@@ -40,11 +41,11 @@ export function ExportButton(props: { eventName: string; attendees: any[] }) {
       setLoading(false);
       setCheckMark(true);
       link.click();
-    }, 1000);
+    }, 1500);
 
     setTimeout(() => {
       setCheckMark(false);
-    }, 2000);
+    }, 4000);
   }
 
   return (

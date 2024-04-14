@@ -1,72 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Attendee, Event, EventAttendee } from "~/types";
 import { ExportButton } from "./ExportButton";
 import { linkedinLogo, twitterLogo } from "./logos";
-
-const eventInfo = {
-  name: "Event 1",
-  date: "2022-10-10",
-  url: "https://www.lu.ma",
-};
-
-const attendees = [
-  {
-    name: "John Doe",
-    linkedin: undefined,
-    twitter: "https://www.twitter.com",
-  },
-  {
-    name: "Jane Smith",
-    linkedin: "https://www.linkedin.com",
-    twitter: "https://www.twitter.com",
-  },
-  {
-    name: "Michael Johnson",
-    linkedin: "https://www.linkedin.com",
-    twitter: "https://www.twitter.com",
-  },
-  {
-    name: "Emily Brown",
-    linkedin: "https://www.linkedin.com",
-    twitter: "https://www.twitter.com",
-  },
-  {
-    name: "David Wilson",
-    linkedin: "https://www.linkedin.com",
-    twitter: "https://www.twitter.com",
-  },
-  {
-    name: "Sarah Davis",
-    linkedin: "https://www.linkedin.com",
-    twitter: "https://www.twitter.com",
-  },
-  {
-    name: "Daniel Taylor",
-    linkedin: "https://www.linkedin.com",
-    twitter: "https://www.twitter.com",
-  },
-  {
-    name: "Olivia Martinez",
-    linkedin: "https://www.linkedin.com",
-    twitter: "https://www.twitter.com",
-  },
-  {
-    name: "James Anderson",
-    linkedin: "https://www.linkedin.com",
-    twitter: "https://www.twitter.com",
-  },
-];
-
-const superAttendees = [
-  ...attendees,
-  ...attendees,
-  ...attendees,
-  ...attendees,
-  ...attendees,
-];
-
-const user = "hdusukehuireh";
+import { fetchConsentedAttendeesForUser, fetchEventById } from "~/supabase";
+import { formatDate } from "~/utils";
 
 export default async function EventPage({
   params,
@@ -75,28 +12,15 @@ export default async function EventPage({
   params: { eventId: string };
   searchParams: { lumaId: string };
 }) {
-  const db = await fetch("http:localhost:3000/db.json");
-  const data = await db.json();
-  const allEvents = data.events as Event[];
-  const thisEvent = allEvents.find((event) => event.eventId === params.eventId);
+  const { eventId } = params;
+  const { lumaId } = searchParams;
 
-  if (!thisEvent) {
-    //TODO: Handle event not found
-    redirect("/404");
-  }
+  const [event] = await fetchEventById(eventId);
+  const attendees = await fetchConsentedAttendeesForUser(lumaId, eventId);
 
-  const eventAttendees = data.event_attendees as EventAttendee[];
-  const thisEventAttendeesIds = eventAttendees
-    .filter((eventAttendee) => eventAttendee.eventId === thisEvent.eventId)
-    .map((eventAttendee) => eventAttendee.lumaId);
+  if (!event) return redirect("/404");
 
-  const allAttendees = data.attendees as Attendee[];
-
-  const thisEventAttendees = allAttendees.filter((attendee) =>
-    thisEventAttendeesIds.includes(attendee.lumaId),
-  );
-
-  const backgroundColor = `bg-[${thisEvent.color}]`;
+  const backgroundColor = `bg-[${event.tint_color}]`;
 
   return (
     <main className={`flex min-h-screen justify-center px-3 py-3 sm:py-6`}>
@@ -107,21 +31,20 @@ export default async function EventPage({
               <p className="text-subtext hover:font-medium">&lsaquo; Back</p>
             </Link>
           )}
-          <img
-            src={thisEvent.image}
-            className="aspect-square w-full self-center rounded-xl max-sm:w-3/5"
-          />
+          {event?.cover_url && (
+            <img
+              src={event.cover_url}
+              className="aspect-square w-full self-center rounded-xl max-sm:w-3/5"
+            />
+          )}
         </div>
         <div className="flex w-full flex-col gap-4">
           <div className="flex w-full items-end justify-between">
             <div className="flex flex-col gap-4">
-              <h1 className="text-3xl font-bold">{thisEvent.name}</h1>
-              <p>{thisEvent.date}</p>
+              <h1 className="text-3xl font-bold">{event.name}</h1>
+              <p className="text-lg text-subtext">{formatDate(event.start_at)}</p>
             </div>
-            <ExportButton
-              eventName={eventInfo.name}
-              attendees={thisEventAttendees}
-            />
+            <ExportButton eventName={event.name ?? event.start_at ?? ""} attendees={attendees}/>
           </div>
           <div className="overflow-auto rounded-xl border border-text border-opacity-[.16]">
             <table className="table table-zebra">
@@ -134,30 +57,41 @@ export default async function EventPage({
                 </tr>
               </thead>
               <tbody>
-                {thisEventAttendees.map((attendee, index) => (
+                {attendees.map((attendee, index) => (
                   <tr key={index}>
                     <td>
                       <div className="avatar">
                         <div className="w-12 rounded-xl">
-                          <img src="https://cdn.lu.ma/avatars-default/avatar_21.png" />
+                          <img
+                            src={
+                              attendee.avatar_url ??
+                              "https://cdn.lu.ma/avatars-default/avatar_21.png"
+                            }
+                          />
                         </div>
                       </div>
                     </td>
                     <td>
                       <a
-                        href={`http://localhost:3000/user/${attendee.lumaId}?lumaId=${searchParams.lumaId}`}
+                        href={`/user/${attendee.id}?lumaId=${searchParams.lumaId}`}
                       >
                         {attendee.name}
                       </a>
                     </td>
                     <td>
-                      <a href={attendee.linkedin} target="_blank">
-                        {attendee.linkedin ? linkedinLogo : ""}
+                      <a
+                        href={`https://linkedin.com/${attendee.linkedin_handle}`}
+                        target="_blank"
+                      >
+                        {attendee.linkedin_handle ? linkedinLogo : ""}
                       </a>
                     </td>
                     <td>
-                      <a href={attendee.twitter} target="_blank">
-                        {attendee.twitter ? twitterLogo : ""}
+                      <a
+                        href={`https://x.com/${attendee.twitter_handle}`}
+                        target="_blank"
+                      >
+                        {attendee.twitter_handle ? twitterLogo : ""}
                       </a>
                     </td>
                   </tr>

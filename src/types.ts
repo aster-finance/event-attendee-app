@@ -1,25 +1,5 @@
-export type Attendee = {
-  name: string;
-  linkedin: string;
-  twitter: string;
-  lumaId: string;
-};
-
-export type Event = {
-  name: string;
-  date: string;
-  location: string;
-  eventId: string;
-  image: string;
-  color: string;
-};
-
-export type EventAttendee = {
-  lumaId: string;
-  eventId: string;
-};
-
-export type Scrape = {
-  lumaId: string;
-  eventId: string;
-};
+import { Database } from "types/supabase";
+export type Model<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Row"];
+export type Event = Model<"events">;
+export type User = Model<"users">;
