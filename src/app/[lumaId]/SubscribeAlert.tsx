@@ -1,0 +1,38 @@
+"use client";
+
+import { motion } from "framer-motion";
+
+export default function SubscribeAlert() {
+  return (
+    <motion.div
+      initial={{ opacity: 1, y: 6 }}
+      whileInView={{ opacity: 0, y: -50 }}
+      transition={{
+        delay: 2,
+        duration: 0.8,
+        ease: "easeInOut",
+      }}
+      className="absolute top-2 w-full px-4"
+    >
+      <div role="alert" className="alert alert-success">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6 shrink-0 stroke-current"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>
+          Your purchase has been confirmed! Re-open extension to scrape more
+          events
+        </span>
+      </div>
+    </motion.div>
+  );
+}

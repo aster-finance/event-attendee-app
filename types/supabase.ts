@@ -79,7 +79,9 @@ export type Database = {
           event_tickets: Json | null
           event_type: string | null
           font_title: string | null
-          geo_address_info: Json | null
+          geo_address_info: {
+            [key: string]: string;
+        } | null
           geo_address_visibility: string | null
           geo_latitude: number | null
           geo_longitude: number | null

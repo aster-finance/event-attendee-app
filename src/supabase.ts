@@ -1,8 +1,7 @@
 // background.js
 import { createClient } from "@supabase/supabase-js";
-import _ from "lodash";
-import { Database } from "types/supabase";
-import { Event, User } from "./types";
+import type { Database } from "types/supabase";
+import type { Event, User } from "./types";
 const supabaseUrl = "https://frblrutuutuvhkilgsjb.supabase.co/";
 const supabaseAnonKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyYmxydXR1dXR1dmhraWxnc2piIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMwMTE5MjcsImV4cCI6MjAyODU4NzkyN30.KHRrmd7ZDtN3JElfMLSVe3hUS0ltel15OvDyHRSq13E";
@@ -13,9 +12,13 @@ export const fetchRemainingScrapes = async (userId: string) => {
     .from("subscription")
     .select("*")
     .eq("user_id", userId);
-  if (subscriptionError || !subscriptionData) {
+  
+  if (subscriptionError) {
     throw new Error(subscriptionError.message);
+  } else if (!subscriptionData) {
+    throw new Error("Missing subscription data");
   }
+
   const [subscription] = subscriptionData ?? [];
 
   // unlimited for paying customers
@@ -46,20 +49,26 @@ export const fetchConsentedEventsForUser = async (userId: string) => {
   return data;
 };
 
-export const fetchConsentedSharedEvents = async (
-  userId: string,
-  friendUserId: string,
-) => {
+export const fetchEventsAttendedByUser = async (userId: string) => {
   const { data, error } = await supabase
-    .from("events")
-    .select("*, consented_event_attendees!inner(*)")
-    .eq("consented_event_attendees.user_id", userId)
-    .eq("consented_event_attendees.user_id", friendUserId);
+    .from("event_attendees")
+    .select("event_id")
+    .eq("user_id", userId);
 
   if (error) {
     throw new Error(error.message);
   }
-  return data;
+
+  return data.map((event) => event.event_id);
+}
+
+export const fetchConsentedSharedEvents = async (
+  userId: string,
+  friendUserId: string,
+) => {
+  const mine = await fetchConsentedEventsForUser(userId);
+  const friends = await fetchEventsAttendedByUser(friendUserId);
+  return mine.filter((event) => friends.includes(event.id));
 };
 
 export const fetchEventById = async (eventId: string): Promise<Event[]> => {
@@ -73,6 +82,19 @@ export const fetchEventById = async (eventId: string): Promise<Event[]> => {
   }
   return data;
 };
+
+export const fetchUserById = async (userId: string): Promise<User> => {
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+}
 
 export const fetchConsentedAttendeesForUser = async (
   userId: string,
@@ -103,13 +125,15 @@ export const fetchSubscriptionData = async (userId: string) => {
 export const insertSubscriptionData = async (
   userId: string,
   customerId: string,
+  active: boolean
 ) => {
   const { data, error } = await supabase
     .from("subscription")
-    .insert([
+    .upsert([
       {
         user_id: userId,
         external_customer_id: customerId,
+        status: active ? "active" : "init",
       },
     ])
     .select("*");
