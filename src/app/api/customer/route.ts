@@ -7,7 +7,6 @@ export async function GET(req: Request, res: Response) {
   try {
     const { searchParams } = new URL(req.url);
     const customerId = searchParams.get("customerId");
-    console.log("customerId", customerId);
     if (!customerId) throw new Error("customerId is required");
 
     const customer = await stripe.customers.retrieve(customerId);

@@ -207,14 +207,17 @@ export type Database = {
       subscription: {
         Row: {
           external_customer_id: string
+          status: string | null
           user_id: string
         }
         Insert: {
           external_customer_id: string
+          status?: string | null
           user_id: string
         }
         Update: {
           external_customer_id?: string
+          status?: string | null
           user_id?: string
         }
         Relationships: [
@@ -238,6 +241,7 @@ export type Database = {
           last_online_at: string | null
           linkedin_handle: string | null
           name: string | null
+          platform: string | null
           tiktok_handle: string | null
           timezone: string | null
           twitter_handle: string | null
@@ -256,6 +260,7 @@ export type Database = {
           last_online_at?: string | null
           linkedin_handle?: string | null
           name?: string | null
+          platform?: string | null
           tiktok_handle?: string | null
           timezone?: string | null
           twitter_handle?: string | null
@@ -274,6 +279,7 @@ export type Database = {
           last_online_at?: string | null
           linkedin_handle?: string | null
           name?: string | null
+          platform?: string | null
           tiktok_handle?: string | null
           timezone?: string | null
           twitter_handle?: string | null
@@ -304,6 +310,7 @@ export type Database = {
           last_online_at: string | null
           linkedin_handle: string | null
           name: string | null
+          platform: string | null
           tiktok_handle: string | null
           timezone: string | null
           twitter_handle: string | null
