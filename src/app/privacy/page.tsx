@@ -24,8 +24,8 @@ export default function PrivacyPage() {
         <h2 className="font-medium">Controller</h2>
         <p>
           Who Was At is the controller and responsible for your personal data
-          (collectively referred to as "Company", "we", "us", or "our" in this
-          privacy policy).
+          (collectively referred to as &quot;Company&quot;, &quot;we&quot;,
+          &quot;us&quot;, or &quot;our&quot; in this privacy policy).
         </p>
         <h2 className="font-medium">Contact Details</h2>
         <p>
