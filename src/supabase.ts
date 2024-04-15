@@ -12,7 +12,7 @@ export const fetchRemainingScrapes = async (userId: string) => {
     .from("subscription")
     .select("*")
     .eq("user_id", userId);
-  
+
   if (subscriptionError) {
     throw new Error(subscriptionError.message);
   } else if (!subscriptionData) {
@@ -60,7 +60,7 @@ export const fetchEventsAttendedByUser = async (userId: string) => {
   }
 
   return data.map((event) => event.event_id);
-}
+};
 
 export const fetchConsentedSharedEvents = async (
   userId: string,
@@ -94,7 +94,7 @@ export const fetchUserById = async (userId: string): Promise<User> => {
     throw new Error(error.message);
   }
   return data;
-}
+};
 
 export const fetchConsentedAttendeesForUser = async (
   userId: string,
@@ -125,7 +125,7 @@ export const fetchSubscriptionData = async (userId: string) => {
 export const insertSubscriptionData = async (
   userId: string,
   customerId: string,
-  active: boolean
+  active: boolean,
 ) => {
   const { data, error } = await supabase
     .from("subscription")
@@ -139,6 +139,43 @@ export const insertSubscriptionData = async (
     .select("*");
 
   if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+export const saveEventToDb = async (event: any) => {
+  const { data, error } = await supabase
+    .from("events")
+    .upsert([event])
+    .select("*");
+
+  if (error || !data) {
+    throw new Error(error.message);
+  }
+  return data;
+};
+export const saveUsersToDb = async (users: any) => {
+  const { data, error } = await supabase
+    .from("users")
+    .upsert(users)
+    .select("*");
+
+  if (error || !data) {
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+export const linkAttendeesToEventInDb = async (linkedAttendees: any) => {
+  const { data, error } = await supabase
+    .from("event_attendees")
+    .upsert(linkedAttendees, {
+      ignoreDuplicates: true,
+    })
+    .select("*");
+
+  if (error || !data) {
     throw new Error(error.message);
   }
   return data;
