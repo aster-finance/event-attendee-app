@@ -23,7 +23,12 @@ export default function HomePage() {
               <h2 className="text-2xl font-medium text-text">
                 See everyone you&lsquo;ve ever attended events with
               </h2>
-              <a className="btn btn-neutral">Download the Chrome Extension</a>
+              <a
+                className="btn btn-neutral"
+                href="https://chromewebstore.google.com/detail/who-was-at/kblkcopfeimoblhigccpljnipooiakef"
+              >
+                Download the Chrome Extension
+              </a>
             </div>
             <div className="h-1/2 w-full rounded-2xl ">
               <img
